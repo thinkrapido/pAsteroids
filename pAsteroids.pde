@@ -5,22 +5,28 @@ String message = "";
 Space space;
 int level = 0;
 
+Star [] stars = new Star[100];
+
 void setup() {
   size(640,360);
   colorMode(RGB, 255, 255, 255, 100);
   stroke(255);
-  
+
   space = new Space();
   
+
   ncc1701 = new Spaceship(new PVector(320,180));
   space.add(ncc1701);
+  for(int i=0; i<stars.length;i++) {
+    stars[i] = new Star();
+  }
 }
-  
+
 void draw() {
   background(51);
   space.run();
 }
-  
+
 public void keyPressed() {
   if (ncc1701.dead()) return;
   switch(keyCode) {
@@ -73,6 +79,11 @@ class Space {
   }
   
   void run() {
+    
+    for(int i=0; i<stars.length; i++){
+      stars[i].draw();
+    }
+    stroke(255);
     if (spaceObjects.size() == 1 && spaceObjects.get(0) == ncc1701) {
       level++;
       for (int i = 0; i < level; i++) {
@@ -92,7 +103,7 @@ class Space {
       if (so1 instanceof Shell) continue;
       for (int j = 0; j < spaceObjects.size(); j++) {
         SpaceObject so2 = spaceObjects.get(j);
-        if (so1 == so2) continue;
+        if (so1.equals(so2)) continue;
         if ((so1 instanceof Asteroid && so2 instanceof Shell)
             || (so1 instanceof Asteroid && so2 instanceof Spaceship)
             || (so1 instanceof Spaceship && so2 instanceof Asteroid))
