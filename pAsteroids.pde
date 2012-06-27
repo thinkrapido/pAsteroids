@@ -4,6 +4,7 @@ Spaceship ncc1701;
 String message = "";
 Space space;
 int level = 0;
+boolean keyUp, keyLeft, keyRight, keySpace;
 
 Star [] stars = new Star[100];
 
@@ -24,31 +25,57 @@ void setup() {
 
 void draw() {
   background(51);
+  keyHandling();
   space.run();
 }
 
-public void keyPressed() {
-  if (ncc1701.dead()) return;
+
+
+private void keyHandling() {
+  if(keyUp) {
+    ncc1701.acc = ncc1701.head.get();
+    ncc1701.acc.rotate(HALF_PI);
+    ncc1701.hasBoost = true;
+  }
+  else {
+    ncc1701.acc = ncc1701.stopThrust;
+    ncc1701.hasBoost = false;
+  }
+  if(keyLeft){
+    ncc1701.head.rotate(-PI/16);
+  }
+  if(keyRight){
+    ncc1701.head.rotate(+PI/16);
+  }
+  if(keySpace){
+    space.add(new Shell(ncc1701));
+  }
+}
+
+  public void keyPressed() {
+  if (ncc1701.dead()) {
+    keyUp = false;
+    keyLeft = false;
+    keyRight = false;
+    keySpace = false;
+    return;
+  }
   switch(keyCode) {
-    case 38: // boost
-      ncc1701.acc = ncc1701.head.get();
-      ncc1701.acc.rotate(HALF_PI);
-      ncc1701.hasBoost = true;
-      break;
-    case 37: // rotate left
-      ncc1701.head.rotate(-PI/16);
-      break;
-    case 39: // rotate right
-      ncc1701.head.rotate(+PI/16);
-      break;
-    case 32: // fire
-      space.add(new Shell(ncc1701));
-      break;
+  case 38: keyUp = true; break;
+  case 37: keyLeft = true; break;
+  case 39: keyRight = true; break;
+  case 32: keySpace = true; break;
+  default: break;
   }
 }
 public void keyReleased() {
-  ncc1701.acc = ncc1701.stopThrust;
-  ncc1701.hasBoost = false;
+  switch(keyCode) {
+  case 38: keyUp = false; break;
+  case 37: keyLeft = false; break;
+  case 39: keyRight = false; break;
+  case 32: keySpace = false; break;
+  default: break;
+  }
 }
 
 static PVector vector2SpaceCoordinates(PVector v,float translateX,float translateY,float rotation) {
@@ -70,12 +97,30 @@ static boolean isLeftOfVector(PVector pos, PVector direction, PVector vertex) {
   return out;
 }
 
+class Star {
+
+  private int radiation;
+  private int xloc;
+  private int yloc;
+
+  Star() {
+    radiation = (int) random(50,150);
+    xloc = (int) random(width);
+    yloc = (int) random(height);
+  }
+
+  void draw() {
+    stroke(255,255,255,radiation);
+    point(xloc,yloc);
+  }
+}
+
 class Space {
   
   ArrayList<SpaceObject> spaceObjects;
   
   Space() {
-    spaceObjects = new ArrayList<Asteroids.SpaceObject>();
+    spaceObjects = new ArrayList<SpaceObject>();
   }
   
   void run() {
